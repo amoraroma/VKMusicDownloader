@@ -7,6 +7,8 @@ import json
 import locale
 import numpy as np
 
+import time
+
 import config
 import utils
 import vkapi
@@ -166,9 +168,10 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
         self.action_4.triggered.connect(self.TechInformation)
         self.progressBar.setFormat("%p%")
         self.action_4.setShortcut("Ctrl+T")
-
+ 
 
     def LoadsListMusic(self):
+        self.pushButton.setEnabled(True)
         try:
             with open('DATA', encoding='utf-8') as data_json:
                 data_token = json.loads(data_json.read())
@@ -221,12 +224,14 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
 
     def Downloads(self):
         try:
+            
             self.pushButton.setEnabled(False) 
 
             PATH = utils.get_path(self, self.action_7.isChecked(), QFileDialog)
             self.label_2.setText("Путь для скачивания: " + PATH)
 
             self.completed = 0
+
             downloads_list = []
             getSelected = self.treeWidget.selectedItems()
 
@@ -248,10 +253,11 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
             self.th.progress_range.connect(self.progress)
             self.th.progress.connect(self.progressBar.setValue)
             self.th.loading_audio.connect(self.loading_audio)
-            self.th.message.connect(self.label.setText)
+            self.th.message.connect(self.label.setText)            
             self.th.unavailable_audio.connect(self.unavailable_audio)
             self.th.content_restricted.connect(self.content_restricted)
             self.th.finished.connect(self.finished_loader)
+            self.th.times.connect(self.times)
             self.th.start()
 
             #self.label_3.setText("Загружается:3")
@@ -261,9 +267,12 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
             self.pushButton.setEnabled(True)
 
 
-    @pyqtSlot()
-    def finished_loader(self):
-        QMessageBox.information(self, "Информация", "Аудиозаписи загружены")
+    @pyqtSlot(str, int)
+    def finished_loader(self, unavailable_tracks, coune_unavailable_tracks):
+        if( coune_unavailable_tracks == 0):    
+            QMessageBox.information(self, "Информация", "Аудиозаписи загружены")
+        else:
+            QMessageBox.information(self, "Информация", unavailable_tracks)
         self.pushButton.setEnabled(True)
 
     @pyqtSlot(str)
@@ -271,9 +280,9 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
         self.label_3.setText("Загружается: " + song_name)
 
     @pyqtSlot(str)
-    def unavailable_audio(self, song_name):
+    def unavailable_audio(self, song_name):           
         QMessageBox.warning(self, "Внимание",
-         "Аудиозапись: " + song_name + " недоступна в вашем регионе")
+        "Аудиозапись: " +  + " недоступна в вашем регионе")
 
     @pyqtSlot(str)
     def content_restricted(self, song_name):
@@ -284,6 +293,9 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
     def progress(self, range):
         self.progressBar.setRange(0, range)
 
+    @pyqtSlot(str)
+    def times(self, times):
+        self.label_4.setText(times)
 
     def AboutMessage(self):
         QMessageBox.about(
@@ -342,19 +354,22 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
 
 class Downloads_file(QThread):
 
-    finished = pyqtSignal()
+    finished = pyqtSignal(str,int)
     progress_range = pyqtSignal(int)
     progress = pyqtSignal(int)
     loading_audio = pyqtSignal(str)
     message = pyqtSignal(str)
     unavailable_audio = pyqtSignal(str)
     content_restricted = pyqtSignal(str)
+    times = pyqtSignal(str)
 
     def __init__(self, downloads_list, PATH):
         super().__init__()
         self.downloads_list = downloads_list
         self.PATH = PATH
-
+        self.coune_unavailable_tracks = 0
+        self.unavailable_tracks = "Все кроме:"
+        self.started_time = time.time()
 
     def __del__(self):
         #print(".... end thread.....")
@@ -392,7 +407,9 @@ class Downloads_file(QThread):
                     if (data['response']['items'][item-1]['content_restricted'] == 5):
                         self.content_restricted.emit(song_name)
                     else:
-                        self.unavailable_audio.emit(song_name)
+                        self.unavailable_tracks += "\n" + song_name
+                        self.coune_unavailable_tracks += 1
+                        #self.unavailable_audio.emit(song_name)
 
                 else:
                     self.message.emit(msg)
@@ -400,7 +417,7 @@ class Downloads_file(QThread):
                     utils.downloads_files_in_wget(url, filename, self.update_progress)
                     #utils.downloads_files(url, filename, self.progress)
 
-            self.finished.emit()
+            self.finished.emit(self.unavailable_tracks, self.coune_unavailable_tracks)
             self.loading_audio.emit('')
 
         except Exception as e:
@@ -410,6 +427,9 @@ class Downloads_file(QThread):
     def update_progress(self, current, total, width=80):
         self.progress_range.emit(total)
         self.progress.emit(current)
+        get_time = time.time()
+        get_time -= self.started_time
+        self.times.emit("Время загрузки: "+utils.time_duration(get_time))
 
 
 class NetworkInfo(QThread):
