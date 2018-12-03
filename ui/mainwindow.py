@@ -83,32 +83,48 @@ class Ui_MainWindow(object):
         self.frame_2.setObjectName("frame_2")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.frame_2)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
+
         self.label = QtWidgets.QLabel(self.frame_2)
         self.label.setObjectName("label")
+
         self.verticalLayout_4.addWidget(self.label)
+
         self.label_3 = QtWidgets.QLabel(self.frame_2)
         self.label_3.setObjectName("label_3")
+
         self.verticalLayout_4.addWidget(self.label_3)
         self.verticalLayout_3.addWidget(self.frame_2)
         self.frame_3 = QtWidgets.QFrame(self.frame)
         self.frame_3.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QtWidgets.QFrame.Raised)
+
         self.frame_3.setObjectName("frame_3")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.frame_3)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
+
         self.label_2 = QtWidgets.QLabel(self.frame_3)
         self.label_2.setTabletTracking(False)
         self.label_2.setToolTipDuration(0)
         self.label_2.setTextFormat(QtCore.Qt.AutoText)
         self.label_2.setObjectName("label_2")
         self.verticalLayout_2.addWidget(self.label_2)
+        self.label_2.raise_()
+
+        self.label_4 = QtWidgets.QLabel(self.frame_3)
+        self.label_4.setTabletTracking(False)
+        self.label_4.setToolTipDuration(0)
+        self.label_4.setTextFormat(QtCore.Qt.AutoText)
+        self.label_4.setObjectName("label_4")
+        self.verticalLayout_2.addWidget(self.label_4)
+        self.label_4.raise_()
+
         self.progressBar = QtWidgets.QProgressBar(self.frame_3)
         self.progressBar.setProperty("value", 0)
         self.progressBar.setTextDirection(QtWidgets.QProgressBar.BottomToTop)
         self.progressBar.setObjectName("progressBar")
         self.verticalLayout_2.addWidget(self.progressBar)
         self.progressBar.raise_()
-        self.label_2.raise_()
+
         self.verticalLayout_3.addWidget(self.frame_3)
         self.pushButton = QtWidgets.QPushButton(self.frame)
         self.pushButton.setObjectName("pushButton")
@@ -191,6 +207,7 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "Всего аудиозаписей: Выбрано: Загружено:"))
         self.label_3.setText(_translate("MainWindow", "Загружается: "))
         self.label_2.setText(_translate("MainWindow", "Путь для скачивания: " + os.getcwd()))
+        self.label_4.setText(_translate("MainWindow", "Время загрузки: "))
         self.progressBar.setFormat(_translate("MainWindow", ""))
         self.pushButton.setText(_translate("MainWindow", "Скачать"))
         self.menu.setTitle(_translate("MainWindow", "Аккаунт"))
