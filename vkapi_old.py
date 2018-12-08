@@ -44,44 +44,11 @@ client_keys = [
   [3032107, 'NOmHf1JNKONiIG5zPJUu']  # 'Vika (Blackberry)'
 ]
 
-
-def call_oauth(method, param={}, **kwargs):
-	"""Выполнение метода VK API"""
-	try:
-		response = requests.get(method, 
-			params=param, headers=HEADER, timeout=TIME_OUT).json()
-	except Exception as e:
-		raise e
-
-	if 'error' in response:
-		if 'need_captcha' == response['error']:
-			raise Exception("Error : F*CKING CAPTHA!")
-		
-		elif 'need_validation' == response['error']:
-			raise Exception("Error : 2fa isn't supported")
-		
-		else:
-			raise Exception("Error : {error_description}".format(**response))
-
-	return response
-
-
-def call(method, param={}, **kwargs):
-	"""Выполнение метода VK API"""
-	try:
-		response = requests.get(method, 
-			params=param, headers=HEADER, timeout=TIME_OUT).json()
-	except Exception as e:
-		raise e
-
-	if 'error' in response: 
-		raise Exception("VKError #{error_code}: {error_msg}".format(**response['error']))
-
-	return response
-
-
-def autorization(login, password, client_id, client_secret, captcha_sid, captcha_key, path):
-	param = {
+# https://oauth.vk.com/token?grant_type=password&client_id=&client_secret=&username=&password=&v=5.80&2fa_supported=1
+def autorization(login, password, client_id,
+ client_secret, captcha_sid, captcha_key, path):
+  try:
+    param = {
       'grant_type': 'password',
       'client_id': client_id,
       'client_secret': client_secret,
@@ -92,49 +59,90 @@ def autorization(login, password, client_id, client_secret, captcha_sid, captcha
       'captcha_sid' : captcha_sid,
       'captcha_key' : captcha_key
     }
-	
-	return call_oauth(path + "token", param)
+
+    return requests.get(f'{path}token', 
+      params=param, headers=HEADER, timeout=TIME_OUT).json()
+    
+  except Exception as e:
+    return e
+
+
+def check_token(access_token, path):
+  try:
+    params = {
+      'access_token': access_token,
+      'v' : VK_API_VERSION
+    }
+
+    return requests.get(f'{path}method/secure.checkToken', 
+      params=params, headers=HEADER, timeout=TIME_OUT).json()
+
+  except Exception as e:
+    return e
 
 
 def refreshToken(access_token, path):
-	param = {
-		'access_token': access_token,
-      	'receipt' : receipt,
-      	'v' : VK_API_VERSION
-	}
+  try:
+    params = {
+      'access_token': access_token,
+      'receipt' : receipt,
+      'v' : VK_API_VERSION
+    }
 
-	return call(path + "method/auth.refreshToken", param)
+    return requests.get(f'{path}method/auth.refreshToken', 
+      params=params, headers=HEADER, timeout=TIME_OUT).json()
+
+  except Exception as e:
+    return e
 
 
-def user_get(access_token, path):
-	param = {
-		'access_token':access_token,
-		'v':VK_API_VERSION
-	}
+def user_get(access_token, user_id, path):
+  try:
+    param = {
+      'access_token':access_token,
+      'user_id': user_id,
+      'v': VK_API_VERSION
+    }
 
-	return call(path + "method/users.get", param)
+    return requests.get(f'{path}method/users.get', 
+      params=param, headers=HEADER, timeout=TIME_OUT).json()
+
+  except Exception as e:
+    return e
 
 
 def get_audio(refresh_token, path):
-	param = {
-		'access_token':refresh_token,
-		'v': VK_API_VERSION
-	}
-
-	return call(path + "method/audio.get", param)
-
-
-def get_catalog(refresh_token, path):
-	param = {
+  try:
+    param = {
       'access_token':refresh_token,
       'v': VK_API_VERSION
     }
 
-	return call(path + "method/audio.getCatalog", param)
+    return requests.get(f'{path}method/audio.get', 
+      params=param, headers=HEADER, timeout=TIME_OUT).json()
 
+  except Exception as e:
+    return e
+
+
+# Рекомендации
+def get_catalog(refresh_token, path):
+  try:
+    param = {
+      'access_token':refresh_token,
+      'v': VK_API_VERSION
+    }
+
+    return requests.get(f'{path}method/audio.getCatalog',
+      params=param, headers=HEADER, timeout=TIME_OUT).json()
+
+  except Exception as e:
+     return e
+ 
 
 def get_playlist(refresh_token, path):
-	param = {  
+  try:
+    param = {  
       'access_token':refresh_token,
       'owner_id':'306788767',
       'id':'',
@@ -142,17 +150,25 @@ def get_playlist(refresh_token, path):
       'v': VK_API_VERSION
     }
 
-	return call(path + "method/execute.getPlaylist", param)
+    return requests.get(f'{path}method/execute.getPlaylist',
+      params=param, headers=HEADER, timeout=TIME_OUT).json()
+
+  except Exception as e:
+    return e
 
 
 def get_music_page(refresh_token, path):
-	param = {
-      'owner_id': '',
+  try:
+    param = {
+      'owner_id': '306788767',
       'func_v':3,
       'need_playlists':1,
       'access_token':refresh_token,
       'v': VK_API_VERSION
     }
 
-	return call(path + "method/execute.getMusicPage", param)
+    return requests.get(f'{path}method/execute.getMusicPage',
+      params=param, headers=HEADER, timeout=TIME_OUT).json()
 
+  except Exception as e:
+    return e

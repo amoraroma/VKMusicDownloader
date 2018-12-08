@@ -10,6 +10,7 @@ import numpy as np
 import config
 import utils
 import vkapi
+import vk_api
 
 from ui import auth
 from ui import tech_info
@@ -94,7 +95,7 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
 
         except Exception as e:
             self.statusBar().showMessage('Login failed :(')
-            QMessageBox.critical(self, "F*CK", str(r))
+            QMessageBox.critical(self, "F*CK", str(e))
             #self.window = MainWindow()
             #self.hide()
             #self.window.show()
@@ -170,52 +171,50 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
 
     def LoadsListMusic(self):
         try:
+            self.pushButton.setEnabled(True)
+
             with open('DATA', encoding='utf-8') as data_json:
                 data_token = json.loads(data_json.read())
 
             access_token = data_token["access_token"]
             refresh_token = data_token["token"]
+            
+            path_api = utils.get_host_api(self.action_5.isChecked())
+            path_oauth = utils.get_host_oauth(self.action_5.isChecked())
 
-            try:
-                path_api = utils.get_host_api(self.action_5.isChecked())
-                path_oauth = utils.get_host_oauth(self.action_5.isChecked())
+            data = vkapi.get_audio(refresh_token, path_api)
+            utils.save_json('response.json', data)
 
-                data = vkapi.get_audio(refresh_token, path_api)
-                utils.save_json('response.json', data)
+            count_track = data['response']['count']
+            i = 0
 
-                count_track = data['response']['count']
-                i = 0
+            QtWidgets.QTreeWidget.clear(self.treeWidget)
 
-                QtWidgets.QTreeWidget.clear(self.treeWidget)
+            for count in data['response']['items']:
 
-                for count in data['response']['items']:
+                test = QtWidgets.QTreeWidgetItem(self.treeWidget)
 
-                    test = QtWidgets.QTreeWidgetItem(self.treeWidget)
+                test.setText(0, str(i + 1))
+                test.setText(1, data['response']['items'][i]['artist'])
+                test.setText(2, data['response']['items'][i]['title'])
+                test.setText(3, utils.time_duration(data['response']['items'][i]['duration']))
+                test.setText(4, utils.unix_time_stamp_convert(data['response']['items'][i]['date']))
 
-                    test.setText(0, str(i + 1))
-                    test.setText(1, data['response']['items'][i]['artist'])
-                    test.setText(2, data['response']['items'][i]['title'])
-                    test.setText(3, utils.time_duration(data['response']['items'][i]['duration']))
-                    test.setText(4, utils.unix_time_stamp_convert(data['response']['items'][i]['date']))
+                if (data['response']['items'][i]['is_hq']):
+                    if (data['response']['items'][i]['is_explicit']):
+                        test.setText(5, "HQ (E)")
+                    else:
+                        test.setText(5, "HQ")
+                
+                if (data['response']['items'][i]['url'] == ""):
+                    test.setText(6, "Недоступно")
 
-                    if (data['response']['items'][i]['is_hq']):
-                        if (data['response']['items'][i]['is_explicit']):
-                            test.setText(5, "HQ (E)")
-                        else:
-                            test.setText(5, "HQ")
+                i += 1
 
-                    if (data['response']['items'][i]['url'] == ""):
-                        test.setText(6, "Недоступно")
+            self.label.setText("Всего аудиозаписей: " + str(count_track)
+                + " Выбрано: " + str(0) + " Загружено: " + str(0))
 
-                    i += 1
-
-                self.label.setText("Всего аудиозаписей: " + str(count_track)
-                    + " Выбрано: " + str(0) + " Загружено: " + str(0))
-
-            except Exception as e:
-                QMessageBox.critical(self, "F*CK", str(data))
-
-        except OSError as e:
+        except Exception as e:
             QMessageBox.critical(self, "F*CK", str(e))
 
 
@@ -252,10 +251,10 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
             self.th.unavailable_audio.connect(self.unavailable_audio)
             self.th.content_restricted.connect(self.content_restricted)
             self.th.finished.connect(self.finished_loader)
+            self.th.abort_download.connect(self.aborted_download)
             self.th.start()
 
             #self.label_3.setText("Загружается:3")
-
         except Exception as e:
             QMessageBox.critical(self, "F*CK", str(e))
             self.pushButton.setEnabled(True)
@@ -267,18 +266,33 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
         self.pushButton.setEnabled(True)
 
     @pyqtSlot(str)
+    def aborted_download(self, err_msg):
+        QMessageBox.critical(self, "F*CK", "Загрузка прервана. Причина: " + err_msg)
+        self.pushButton.setEnabled(True)
+
+    @pyqtSlot(str)
     def loading_audio(self, song_name):
-        self.label_3.setText("Загружается: " + song_name)
+        if len(song_name) > 115:
+            self.label_3.setText("Загружается: " + song_name[0:115])
+        else:
+            self.label_3.setText("Загружается: " + song_name)
 
     @pyqtSlot(str)
     def unavailable_audio(self, song_name):
         QMessageBox.warning(self, "Внимание",
          "Аудиозапись: " + song_name + " недоступна в вашем регионе")
 
-    @pyqtSlot(str)
-    def content_restricted(self, song_name):
-        QMessageBox.warning(self, "Внимание",
-         "Доступ к аудиозаписи: " + song_name + " скоро будет открыт")
+    @pyqtSlot(int, str)
+    def content_restricted(self, id_restrict,  song_name):
+        if id_restrict == 1:
+            QMessageBox.warning(self, "Внимание",
+                "Аудиозапись: " + song_name + " недоступна по решению правообладателя")
+        elif id_restrict == 2:
+            QMessageBox.warning(self, "Внимание",
+                "Аудиозапись: " + song_name + " недоступна в вашем регионе по решению правообладателя")
+        elif id_restrict == 5:
+            QMessageBox.warning(self, "Внимание",
+                "Доступ к аудиозаписи: " + song_name + " скоро будет открыт")
 
     @pyqtSlot(int)
     def progress(self, range):
@@ -343,12 +357,13 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
 class Downloads_file(QThread):
 
     finished = pyqtSignal()
+    abort_download = pyqtSignal(str)
     progress_range = pyqtSignal(int)
     progress = pyqtSignal(int)
     loading_audio = pyqtSignal(str)
     message = pyqtSignal(str)
     unavailable_audio = pyqtSignal(str)
-    content_restricted = pyqtSignal(str)
+    content_restricted = pyqtSignal(int, str)
 
     def __init__(self, downloads_list, PATH):
         super().__init__()
@@ -389,8 +404,16 @@ class Downloads_file(QThread):
                 #self.progress_range.emit(total)
 
                 if (data['response']['items'][item-1]['url'] == ""):
+                    
                     if (data['response']['items'][item-1]['content_restricted'] == 5):
-                        self.content_restricted.emit(song_name)
+                        self.content_restricted.emit(5, song_name)
+
+                    elif (data['response']['items'][item-1]['content_restricted'] == 2):
+                        self.content_restricted.emit(2, song_name)
+
+                    elif (data['response']['items'][item-1]['content_restricted'] == 1):
+                        self.content_restricted.emit(1, song_name)
+
                     else:
                         self.unavailable_audio.emit(song_name)
 
@@ -404,7 +427,7 @@ class Downloads_file(QThread):
             self.loading_audio.emit('')
 
         except Exception as e:
-            pass
+            self.abort_download.emit(str(e))
 
     # Magic. Do not touch.
     def update_progress(self, current, total, width=80):
@@ -480,7 +503,8 @@ def start():
             sys.exit(app.exec_())
 
     except Exception as e:
-        sys.exit(app.exec_())
+        print("F*CK: " + str(e))
+        exit()
 
 
 if __name__ == '__main__':

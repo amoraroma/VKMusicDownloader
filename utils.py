@@ -15,7 +15,10 @@ import vkapi
 
 
 def remove_symbols(filename):
-	return re.sub(r'[\/:;*?<>|«»",]', "", filename)
+	if len(filename) >=128:
+		return re.sub(r'[\\\\/:*?\"<>|]', "", filename[0:124])
+	else:
+		return re.sub(r'[\\\\/:*?\"<>|]', "", filename)
 
 
 def check_file_path(path):
@@ -38,13 +41,6 @@ def get_path(self, flags, Object):
 			return path	 
 	else:
 		return os.getcwd()
-
-
-def get_file_size(file):
-	if check_file_path(file):
-		return os.path.getsize(file)
-	else:
-		return None
 
 
 def get_host_api(flags):
@@ -106,10 +102,3 @@ def save_json(filename, data):
 
 def downloads_files_in_wget(url, filename, progress):
 	wget.download(url, filename, bar=progress)
-
-
-def get_size_content(url):
-	try:
-		return requests.head(url, timeout=5).headers['content-length']
-	except 	Exception as e:
-		return 0
