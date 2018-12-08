@@ -1,4 +1,8 @@
 # VKMusicDownloader
+[![GitHub license](https://img.shields.io/github/license/keyzt/VKMusicDownloader.svg)](https://github.com/keyzt/VKMusicDownloader/blob/master/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/keyzt/VKMusicDownloader.svg)](https://github.com/keyzt/VKMusicDownloader/issues)
+[![image](https://img.shields.io/github/contributors/keyzt/VKMusicDownloader.svg)](https://github.com/keyzt/VKMusicDownloader/graphs/contributors)
+
 Кроссплатформенный клиент для массового скачивания музыки из ВКонтакте.
 
 # **Установка**
