@@ -4,6 +4,7 @@
 [![image](https://img.shields.io/github/contributors/keyzt/VKMusicDownloader.svg)](https://github.com/keyzt/VKMusicDownloader/graphs/contributors)
 [![GitHub downloads](https://img.shields.io/github/downloads/keyzt/VKMusicDownloader/latest/total.svg)](https://github.com/keyzt/VKMusicDownloader/releases/latest)
 [![GitHub downloads](https://img.shields.io/github/downloads/keyzt/VKMusicDownloader/total.svg)](https://github.com/keyzt/VKMusicDownloader/releases)
+
 Кроссплатформенный клиент для массового скачивания музыки из ВКонтакте.
 
 # **Установка**
