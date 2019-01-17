@@ -10,7 +10,6 @@ import numpy as np
 import config
 import utils
 import vkapi
-import vk_api
 
 from ui import auth
 from ui import tech_info
