@@ -122,7 +122,6 @@ def user_get(access_token, path):
 
 def get_audio(refresh_token, path):
 	param = {
-		'user_id':'214353585',
 		'access_token':refresh_token,
 		'v': VK_API_VERSION
 	}
