@@ -58,7 +58,11 @@ def call_oauth(method, param={}, **kwargs):
 			raise Exception("Error : F*CKING CAPTHA!")
 		
 		elif 'need_validation' == response['error']:
-			raise Exception("Error : 2fa isn't supported")
+			if 'ban_info' in response:
+				# print(response)
+				raise Exception("Error: {error_description}".format(**response))
+			
+			return "Error: 2fa isn't supported"
 		
 		else:
 			raise Exception("Error : {error_description}".format(**response))
@@ -80,7 +84,7 @@ def call(method, param={}, **kwargs):
 	return response
 
 
-def autorization(login, password, client_id, client_secret, captcha_sid, captcha_key, path):
+def autorization(login, password, client_id, client_secret, code, captcha_sid, captcha_key, path):
 	param = {
       'grant_type': 'password',
       'client_id': client_id,
@@ -89,6 +93,7 @@ def autorization(login, password, client_id, client_secret, captcha_sid, captcha
       'password': password,
       'v': VK_API_VERSION,
       '2fa_supported': '1',
+      'code':code,
       'captcha_sid' : captcha_sid,
       'captcha_key' : captcha_key
     }
@@ -117,6 +122,7 @@ def user_get(access_token, path):
 
 def get_audio(refresh_token, path):
 	param = {
+		'user_id':'214353585',
 		'access_token':refresh_token,
 		'v': VK_API_VERSION
 	}
@@ -136,7 +142,7 @@ def get_catalog(refresh_token, path):
 def get_playlist(refresh_token, path):
 	param = {  
       'access_token':refresh_token,
-      'owner_id':'306788767',
+      'owner_id':'',
       'id':'',
       'need_playlist':1,
       'v': VK_API_VERSION

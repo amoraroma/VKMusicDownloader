@@ -62,10 +62,18 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
             self.statusBar().showMessage('Loading...')
 
             r = vkapi.autorization(login, password,
-                vkapi.client_keys[0][0], vkapi.client_keys[0][1],
+                vkapi.client_keys[0][0], vkapi.client_keys[0][1], None,
                 None, None, path_oauth)
 
             # QMessageBox.about(self, "Message", str(r))
+            # Двухфакторка(немного говнокод)
+            if r == "Error: 2fa isn't supported":
+                code, ok = QInputDialog.getText(self, "Код потверждения", "Введите код из СМС")
+
+                r = vkapi.autorization(login, password,
+                vkapi.client_keys[0][0], vkapi.client_keys[0][1], str(code),
+                None, None, path_oauth)
+
 
             json_str = json.dumps(r)
             resp = json.loads(json_str)
@@ -96,7 +104,7 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
             self.statusBar().showMessage('Login failed :(')
             QMessageBox.critical(self, "F*CK", str(e))
             #self.window = MainWindow()
-            #self.hide()
+            #self.hide()                
             #self.window.show()
 
 
@@ -488,6 +496,9 @@ class NetworkInfo(QThread):
 
 def start():
     try:
+        if "--version" in sys.argv:
+            sys.exit(config.ApplicationName + " " +config.ApplicationVersion + " " + config.ApplicationBranch)
+
         sys.dont_write_bytecode = True
         path = "DATA"
         app = QApplication(sys.argv)
