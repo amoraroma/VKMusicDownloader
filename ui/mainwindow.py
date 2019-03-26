@@ -15,6 +15,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(710, 495)
+
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -63,6 +64,7 @@ class Ui_MainWindow(object):
         self.treeWidget.setAllColumnsShowFocus(True)
         self.treeWidget.setColumnCount(7)
         self.treeWidget.setObjectName("treeWidget")
+        
         self.treeWidget.header().setDefaultSectionSize(119)
         self.treeWidget.header().setHighlightSections(True)
         self.treeWidget.header().setSortIndicatorShown(False)
@@ -72,6 +74,7 @@ class Ui_MainWindow(object):
         self.treeWidget.header().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
         self.treeWidget.header().setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeToContents)
         self.treeWidget.header().setSectionResizeMode(6, QtWidgets.QHeaderView.ResizeToContents)
+
 
         self.verticalLayout_3.addWidget(self.treeWidget)
         self.pushButton_2 = QtWidgets.QPushButton(self.frame)
@@ -187,15 +190,22 @@ class Ui_MainWindow(object):
         self.treeWidget.headerItem().setText(4, _translate("MainWindow", "Дата добавления"))
         self.treeWidget.headerItem().setText(5, _translate("MainWindow", "Tags"))
         self.treeWidget.headerItem().setText(6, _translate("MainWindow", "Доступность"))
+        # self.treeWidget.headerItem().setIcon(6, QIcon("assets/icon/downloader.png"))
+        
         self.pushButton_2.setText(_translate("MainWindow", "Загрузить список аудиозаписей"))
+        
         self.label.setText(_translate("MainWindow", "Всего аудиозаписей: Выбрано: Загружено:"))
         self.label_3.setText(_translate("MainWindow", "Загружается: "))
         self.label_2.setText(_translate("MainWindow", "Путь для скачивания: " + os.getcwd()))
+        
         self.progressBar.setFormat(_translate("MainWindow", ""))
+        
         self.pushButton.setText(_translate("MainWindow", "Скачать"))
+        
         self.menu.setTitle(_translate("MainWindow", "Аккаунт"))
         self.menu_2.setTitle(_translate("MainWindow", "Помощь"))
         self.menu_3.setTitle(_translate("MainWindow", "Настройки"))
+        
         self.action.setText(_translate("MainWindow", "О программе"))
         self.action_2.setText(_translate("MainWindow", "Выйти из аккаунта"))
         self.action_3.setText(_translate("MainWindow", "Помощь проекту"))

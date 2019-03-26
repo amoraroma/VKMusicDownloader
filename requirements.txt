@@ -1,7 +1,3 @@
-lazy-object-proxy
-numpy
-pandas
-pylint
 python-dateutil==2.7.2
 requests==2.18.4
 urllib3==1.22

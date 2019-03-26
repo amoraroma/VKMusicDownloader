@@ -28,7 +28,6 @@ PROXY_KATE = {'https' : 'https://proxy.katemobile.ru:3752'}
 #receipt = "GF54PiFkdbb:APA91bEgyuoeagtS_1avbyY-_6UPRQ5fCJZwbv016qlNY-84iM81bfJgzIc28Tq_U7rvCqWb04nCOlj1M5A2yvZ793cnF8uZHhvKoGeHv9IzmR2ysSkKCn3aAff01IYFEv5nZFf02_hkVfszB2TRJ21XTNaUtvYO9A"
 receipt = "JSv5FBbXbY:APA91bF2K9B0eh61f2WaTZvm62GOHon3-vElmVq54ZOL5PHpFkIc85WQUxUH_wae8YEUKkEzLCcUC5V4bTWNNPbjTxgZRvQ-PLONDMZWo_6hwiqhlMM7gIZHM2K2KhvX-9oCcyD1ERw4"
 
-
 # client_id и client_secret приложений
 client_keys = [
   [2274003, 'hHbZxrka2uZ6jB1inYsH'], # 'Android'
@@ -152,7 +151,6 @@ def get_playlist(refresh_token, path):
 
 def get_music_page(refresh_token, path):
 	param = {
-      'owner_id': '',
       'func_v':3,
       'need_playlists':1,
       'access_token':refresh_token,
@@ -160,4 +158,3 @@ def get_music_page(refresh_token, path):
     }
 
 	return call(path + "method/execute.getMusicPage", param)
-

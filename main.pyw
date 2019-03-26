@@ -5,7 +5,6 @@ import os
 import sys
 import json
 import locale
-import numpy as np
 
 import config
 import utils
@@ -45,7 +44,7 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
         self.setWindowIcon(QIcon(config.IconPath))
         self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint)
 
-        self.statusBar().showMessage("2fa isn't supported")
+        self.statusBar().showMessage("2fa is supported :)")
 
         self.pushButton.clicked.connect(self.autorizations)
         self.pushButton.setShortcut("Return")
@@ -66,13 +65,19 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
                 None, None, path_oauth)
 
             # QMessageBox.about(self, "Message", str(r))
+            
             # Двухфакторка(немного говнокод)
-            if r == "Error: 2fa isn't supported":
+            if (r =="Error: 2fa isn't supported"):
                 code, ok = QInputDialog.getText(self, "Код потверждения", "Введите код из СМС")
 
-                r = vkapi.autorization(login, password,
-                vkapi.client_keys[0][0], vkapi.client_keys[0][1], str(code),
-                None, None, path_oauth)
+                if ok:
+                    r = vkapi.autorization(login, password,
+                        vkapi.client_keys[0][0], vkapi.client_keys[0][1], str(code),
+                        None, None, path_oauth)
+                else:
+                    r = vkapi.autorization(login, password,
+                        vkapi.client_keys[0][0], vkapi.client_keys[0][1], "",
+                        None, None, path_oauth)
 
 
             json_str = json.dumps(r)
@@ -164,7 +169,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
         self.setupUi(self)
         self.setWindowIcon(QIcon(config.IconPath))
         self.setWindowFlags(QtCore.Qt.Window)
-
+        
         self.pushButton_2.clicked.connect(self.LoadsListMusic)
         self.pushButton.clicked.connect(self.Downloads)
         self.action.triggered.connect(self.AboutMessage)
@@ -246,7 +251,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
 
             #QApplication.processEvents()
 
-            if (np.size(downloads_list) == 0):
+            if (downloads_list.__len__() == 0):
                     QMessageBox.information(self, "Информация",
                      "Ничего не выбрано.")
 
@@ -292,14 +297,14 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
     @pyqtSlot(int, str)
     def content_restricted(self, id_restrict,  song_name):
         if id_restrict == 1:
-            QMessageBox.warning(self, "Внимание",
-                "Аудиозапись: " + song_name + " недоступна по решению правообладателя")
+            message = "Аудиозапись: " + song_name + " недоступна по решению правообладателя"
         elif id_restrict == 2:
-            QMessageBox.warning(self, "Внимание",
-                "Аудиозапись: " + song_name + " недоступна в вашем регионе по решению правообладателя")
+            message = "Аудиозапись: " + song_name + " недоступна в вашем регионе по решению правообладателя"
         elif id_restrict == 5:
-            QMessageBox.warning(self, "Внимание",
-                "Доступ к аудиозаписи: " + song_name + " скоро будет открыт")
+            message = "Доступ к аудиозаписи: " + song_name + " скоро будет открыт"
+        
+        # QMessageBox.warning(self, "Внимание", message)
+        self.statusBar().showMessage(message)
 
     @pyqtSlot(int)
     def progress(self, range):
@@ -391,7 +396,7 @@ class Downloads_file(QThread):
             self.completed = 0
 
             count_track = data['response']['count']
-            selected = np.size(self.downloads_list)
+            selected = self.downloads_list.__len__()
 
             for item in self.downloads_list:
                 self.completed += 1

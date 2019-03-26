@@ -7,6 +7,9 @@ import sys
 import datetime
 import json
 
+import base64
+import codecs
+
 import requests
 import socket
 import wget
@@ -16,9 +19,9 @@ import vkapi
 
 def remove_symbols(filename):
 	if len(filename) >=128:
-		return re.sub(r'[\\\\/:*?\"<>|]', "", filename[0:124])
+		return re.sub(r'[\\\\/:*?\"<>|\n\r\xa0]', "", filename[0:126])
 	else:
-		return re.sub(r'[\\\\/:*?\"<>|]', "", filename)
+		return re.sub(r'[\\\\/:*?\"<>|\n\r\xa0]', "", filename)
 
 
 def check_file_path(path):
@@ -98,6 +101,28 @@ def time_duration(time):
 def save_json(filename, data):
     with open(filename, 'w', encoding='utf-8') as file:
             json.dump(data, file, indent=2, ensure_ascii=False)
+
+
+def encode(data):
+	return bytes(codecs.encode(bytes(data, 'utf-8'), 'hex')).decode("utf-8")
+
+
+def base64_encode(data):
+	try:
+		return str(base64.b64encode(data.encode()).decode())
+	except Exception as e:
+		return None
+
+
+def decode(data):
+	return bytes(codecs.decode(data, 'hex')).decode("utf-8")
+
+
+def base64_decode(data):
+	try:
+		return str(base64.b64decode(data).decode())
+	except Exception as e:
+		return None
 
 
 def downloads_files_in_wget(url, filename, progress):
