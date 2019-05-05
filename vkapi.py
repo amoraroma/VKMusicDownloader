@@ -83,7 +83,7 @@ def call(method, param={}, **kwargs):
 	return response
 
 
-def autorization(login, password, client_id, client_secret, code, captcha_sid, captcha_key, path):
+def autorization(login, password, client_id, client_secret, path, code=None, captcha_sid=None, captcha_key=None):
 	param = {
       'grant_type': 'password',
       'client_id': client_id,

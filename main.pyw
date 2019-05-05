@@ -61,8 +61,7 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
             self.statusBar().showMessage('Loading...')
 
             r = vkapi.autorization(login, password,
-                vkapi.client_keys[0][0], vkapi.client_keys[0][1], None,
-                None, None, path_oauth)
+                vkapi.client_keys[0][0], vkapi.client_keys[0][1], path_oauth)
 
             # QMessageBox.about(self, "Message", str(r))
             
@@ -72,12 +71,10 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
 
                 if ok:
                     r = vkapi.autorization(login, password,
-                        vkapi.client_keys[0][0], vkapi.client_keys[0][1], str(code),
-                        None, None, path_oauth)
+                        vkapi.client_keys[0][0], vkapi.client_keys[0][1], path_oauth, str(code))
                 else:
                     r = vkapi.autorization(login, password,
-                        vkapi.client_keys[0][0], vkapi.client_keys[0][1], "",
-                        None, None, path_oauth)
+                       vkapi.client_keys[0][0], vkapi.client_keys[0][1], path_oauth, "")
 
 
             json_str = json.dumps(r)
