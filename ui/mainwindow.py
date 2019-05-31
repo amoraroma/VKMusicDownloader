@@ -92,6 +92,7 @@ class Ui_MainWindow(object):
         self.label_3 = QtWidgets.QLabel(self.frame_2)
         self.label_3.setObjectName("label_3")
         self.verticalLayout_4.addWidget(self.label_3)
+
         self.verticalLayout_3.addWidget(self.frame_2)
         self.frame_3 = QtWidgets.QFrame(self.frame)
         self.frame_3.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -124,16 +125,14 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
+        
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 708, 21))
         self.menubar.setObjectName("menubar")
-
         self.menu = QtWidgets.QMenu(self.menubar)
         self.menu.setObjectName("menu")
-
         self.menu_2 = QtWidgets.QMenu(self.menubar)
         self.menu_2.setObjectName("menu_2")
-
         self.menu_3 = QtWidgets.QMenu(self.menubar)
         self.menu_3.setObjectName("menu_3")
         MainWindow.setMenuBar(self.menubar)
@@ -158,17 +157,19 @@ class Ui_MainWindow(object):
         self.action_7.setObjectName("action_7")
         self.action_7.setCheckable(True)
 
+        # self.action_6 = QtWidgets.QAction(MainWindow)
+        # self.action_6.setObjectName("action_6")
+        # self.action_6.setCheckable(True)
+
         self.menu.addAction(self.action_2)
         self.menu_2.addAction(self.action_4)
         self.menu_2.addAction(self.action_3)
         self.menu_2.addAction(self.action)
 
 
-        self.menu_3.addAction(self.action_5)
         self.menu_3.addAction(self.action_7)
-
-
         self.menu_3.addAction(self.action_5)
+        # self.menu_3.addAction(self.action_6)
 
         self.menubar.addAction(self.menu.menuAction())
         self.menubar.addAction(self.menu_3.menuAction())
@@ -190,7 +191,6 @@ class Ui_MainWindow(object):
         self.treeWidget.headerItem().setText(4, _translate("MainWindow", "Дата добавления"))
         self.treeWidget.headerItem().setText(5, _translate("MainWindow", "Tags"))
         self.treeWidget.headerItem().setText(6, _translate("MainWindow", "Доступность"))
-        # self.treeWidget.headerItem().setIcon(6, QIcon("assets/icon/downloader.png"))
         
         self.pushButton_2.setText(_translate("MainWindow", "Загрузить список аудиозаписей"))
         
@@ -211,5 +211,6 @@ class Ui_MainWindow(object):
         self.action_3.setText(_translate("MainWindow", "Помощь проекту"))
         self.action_4.setText(_translate("MainWindow", "Техническая информация"))
         self.action_5.setText(_translate("MainWindow", "Включить прокси"))
+        # self.action_6.setText(_translate("MainWindow", "Использовать системные настройки прокси"))
         self.action_7.setText(_translate("MainWindow", "Выбрать папку для скачивания"))
 

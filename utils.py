@@ -103,27 +103,5 @@ def save_json(filename, data):
             json.dump(data, file, indent=2, ensure_ascii=False)
 
 
-def encode(data):
-	return bytes(codecs.encode(bytes(data, 'utf-8'), 'hex')).decode("utf-8")
-
-
-def base64_encode(data):
-	try:
-		return str(base64.b64encode(data.encode()).decode())
-	except Exception as e:
-		return None
-
-
-def decode(data):
-	return bytes(codecs.decode(data, 'hex')).decode("utf-8")
-
-
-def base64_decode(data):
-	try:
-		return str(base64.b64decode(data).decode())
-	except Exception as e:
-		return None
-
-
 def downloads_files_in_wget(url, filename, progress):
 	wget.download(url, filename, bar=progress)

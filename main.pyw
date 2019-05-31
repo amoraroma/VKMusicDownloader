@@ -31,9 +31,6 @@ tech_info_window = None
 # Окно авторизации
 auth_window = None
 
-# стиль окна
-sys.argv += ['--style', 'fusion']
-
 
 # Окно авторизации
 class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
@@ -174,14 +171,14 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
         self.action_2.triggered.connect(self.Logout)
         self.action_3.triggered.connect(self.Donate)
         self.action_4.triggered.connect(self.TechInformation)
-        self.progressBar.setFormat("%p%")
+        self.progressBar.setFormat("%p% (%v/%m)")
         self.action_4.setShortcut("Ctrl+T")
 
 
     def LoadsListMusic(self):
         try:
             self.pushButton.setEnabled(True)
-
+            
             with open('DATA', encoding='utf-8') as data_json:
                 data_token = json.loads(data_json.read())
 
@@ -306,6 +303,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
     @pyqtSlot(int)
     def progress(self, range):
         self.progressBar.setRange(0, range)
+
 
 
     def AboutMessage(self):
@@ -503,7 +501,11 @@ def start():
 
         sys.dont_write_bytecode = True
         path = "DATA"
+        
         app = QApplication(sys.argv)
+        app.setApplicationName(config.ApplicationName)
+        app.setApplicationVersion(config.ApplicationVersion)
+        app.setStyle('Fusion')
 
         if (utils.check_file_path(path)):
             ex = MainWindow()
