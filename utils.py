@@ -7,9 +7,6 @@ import sys
 import datetime
 import json
 
-import base64
-import codecs
-
 import requests
 import socket
 import wget
@@ -24,14 +21,12 @@ def remove_symbols(filename):
 		return re.sub(r'[\\\\/:*?\"<>|\n\r\xa0]', "", filename)
 
 
-def check_file_path(path):
+def file_exists(path):
 	try:
-		os.stat(path)
+		return os.path.exists(path)
 	except OSError as e:
 		return False
-
-	return True
-
+		
 
 def get_path(self, flags, Object):
 	if flags:

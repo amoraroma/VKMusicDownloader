@@ -74,8 +74,7 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
                        vkapi.client_keys[0][0], vkapi.client_keys[0][1], path_oauth, "")
 
 
-            json_str = json.dumps(r)
-            resp = json.loads(json_str)
+            resp = json.loads(json.dumps(r))
 
             if (resp.get('access_token') != None):
 
@@ -201,24 +200,23 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
                 test = QtWidgets.QTreeWidgetItem(self.treeWidget)
 
                 test.setText(0, str(i + 1))
-                test.setText(1, data['response']['items'][i]['artist'])
-                test.setText(2, data['response']['items'][i]['title'])
-                test.setText(3, utils.time_duration(data['response']['items'][i]['duration']))
-                test.setText(4, utils.unix_time_stamp_convert(data['response']['items'][i]['date']))
+                test.setText(1, count['artist'])
+                test.setText(2, count['title'])
+                test.setText(3, utils.time_duration(count['duration']))
+                test.setText(4, utils.unix_time_stamp_convert(count['date']))
 
-                if (data['response']['items'][i]['is_hq']):
-                    if (data['response']['items'][i]['is_explicit']):
+                if (count['is_hq']):
+                    if (count['is_explicit']):
                         test.setText(5, "HQ (E)")
                     else:
                         test.setText(5, "HQ")
                 
-                if (data['response']['items'][i]['url'] == ""):
+                if (count['url'] == ""):
                     test.setText(6, "Недоступно")
 
                 i += 1
 
-            self.label.setText("Всего аудиозаписей: " + str(count_track)
-                + " Выбрано: " + str(0) + " Загружено: " + str(0))
+            self.label.setText("Всего аудиозаписей: " + str(count_track) + " Выбрано: " + str(0) + " Загружено: " + str(0))
 
         except Exception as e:
             QMessageBox.critical(self, "F*CK", str(e))
@@ -238,16 +236,16 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
             for i in getSelected:
                 downloads_list.append(int(i.text(0)))
 
-            with open('response.json', encoding='utf-8') as data_json:
-                data = json.loads(data_json.read())
-
+            if (utils.file_exists('response.json')):
+                with open('response.json', encoding='utf-8') as data_json:
+                    data = json.loads(data_json.read())
+            else:
+                raise Exception("File \"response.json\" not found")
+            
             count_track = data['response']['count']
 
-            #QApplication.processEvents()
-
             if (downloads_list.__len__() == 0):
-                    QMessageBox.information(self, "Информация",
-                     "Ничего не выбрано.")
+                QMessageBox.information(self, "Информация", "Ничего не выбрано.")
 
             self.th = Downloads_file(downloads_list, PATH)
             self.th.progress_range.connect(self.progress)
@@ -297,13 +295,12 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
         elif id_restrict == 5:
             message = "Доступ к аудиозаписи: " + song_name + " скоро будет открыт"
         
-        # QMessageBox.warning(self, "Внимание", message)
-        self.statusBar().showMessage(message)
+        QMessageBox.warning(self, "Внимание", message)
+        # self.statusBar().showMessage(message)
 
     @pyqtSlot(int)
     def progress(self, range):
         self.progressBar.setRange(0, range)
-
 
 
     def AboutMessage(self):
@@ -341,17 +338,15 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
 
 
     def Logout(self):
-        reply = QMessageBox.question(self, "Выход из аккаунта",
-         "Вы точно хотите выйти из аккаунта?",
-            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        reply = QMessageBox.question(self, "Выход из аккаунта","Вы точно хотите выйти из аккаунта?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-            if (utils.check_file_path("DATA")):
+            if (utils.file_exists("DATA")):
                 os.remove("DATA")
             else:
                 print("WTF?")
 
-            if (utils.check_file_path("response.json")):
+            if (utils.file_exists("response.json")):
                 os.remove("response.json")
 
             self.auth_window = Auth()
@@ -385,8 +380,11 @@ class Downloads_file(QThread):
 
     def run(self):
         try:
-            with open('response.json', encoding='utf-8') as data_json:
-                data = json.loads(data_json.read())
+            if (utils.file_exists('response.json')):
+                with open('response.json', encoding='utf-8') as data_json:
+                    data = json.loads(data_json.read())
+            else:
+                raise Exception("File \"response.json\" not found")
 
             self.completed = 0
 
@@ -394,13 +392,11 @@ class Downloads_file(QThread):
             selected = self.downloads_list.__len__()
 
             for item in self.downloads_list:
-                self.completed += 1
                 
                 artist = data['response']['items'][item-1]['artist']
                 title = data['response']['items'][item-1]['title']
 
-                msg = "Всего аудиозаписей: " + str(count_track) + " Выбрано: "\
-                 + str(selected) + " Загружено: " + str(self.completed)
+                msg = "Всего аудиозаписей: " + str(count_track) + " Выбрано: " + str(selected) + " Загружено: " + str(self.completed)
 
                 song_name = artist + " - " + title
 
@@ -412,14 +408,8 @@ class Downloads_file(QThread):
 
                 if (data['response']['items'][item-1]['url'] == ""):
                     
-                    if (data['response']['items'][item-1]['content_restricted'] == 5):
-                        self.content_restricted.emit(5, song_name)
-
-                    elif (data['response']['items'][item-1]['content_restricted'] == 2):
-                        self.content_restricted.emit(2, song_name)
-
-                    elif (data['response']['items'][item-1]['content_restricted'] == 1):
-                        self.content_restricted.emit(1, song_name)
+                    if (not data['response']['items'][item-1]['content_restricted']):
+                        self.content_restricted.emit(int(data['response']['items'][item-1]['content_restricted']), song_name)
 
                     else:
                         self.unavailable_audio.emit(song_name)
@@ -429,6 +419,7 @@ class Downloads_file(QThread):
                     self.loading_audio.emit(song_name)
                     utils.downloads_files_in_wget(url, filename, self.update_progress)
                     #utils.downloads_files(url, filename, self.progress)
+                    self.completed += 1
 
             self.finished.emit()
             self.loading_audio.emit('')
@@ -507,7 +498,7 @@ def start():
         app.setApplicationVersion(config.ApplicationVersion)
         app.setStyle('Fusion')
 
-        if (utils.check_file_path(path)):
+        if (utils.file_exists(path)):
             ex = MainWindow()
             ex.show()
             sys.exit(app.exec_())
