@@ -408,7 +408,7 @@ class Downloads_file(QThread):
 
                 if (data['response']['items'][item-1]['url'] == ""):
                     
-                    if (not data['response']['items'][item-1]['content_restricted']):
+                    if (data['response']['items'][item-1]['content_restricted']):
                         self.content_restricted.emit(int(data['response']['items'][item-1]['content_restricted']), song_name)
 
                     else:
