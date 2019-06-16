@@ -44,6 +44,10 @@ client_keys = [
 ]
 
 
+class VKException(Exception):
+	pass
+
+
 def call_oauth(method, param={}, **kwargs):
 	"""Выполнение метода VK API"""
 	try:
@@ -54,17 +58,17 @@ def call_oauth(method, param={}, **kwargs):
 
 	if 'error' in response:
 		if 'need_captcha' == response['error']:
-			raise Exception("Error : F*CKING CAPTHA!")
+			raise VKException("Error : F*CKING CAPTHA!")
 		
 		elif 'need_validation' == response['error']:
 			if 'ban_info' in response:
 				# print(response)
-				raise Exception("Error: {error_description}".format(**response))
+				raise VKException("Error: {error_description}".format(**response))
 			
 			return "Error: 2fa isn't supported"
 		
 		else:
-			raise Exception("Error : {error_description}".format(**response))
+			raise VKException("Error : {error_description}".format(**response))
 
 	return response
 
@@ -78,16 +82,16 @@ def call(method, param={}, **kwargs):
 		raise e
 
 	if 'error' in response: 
-		raise Exception("VKError #{error_code}: {error_msg}".format(**response['error']))
+		raise VKException("VKError #{error_code}: {error_msg}".format(**response['error']))
 
 	return response
 
 
-def autorization(login, password, client_id, client_secret, path, code=None, captcha_sid=None, captcha_key=None):
+def autorization(login, password, path, code=None, captcha_sid=None, captcha_key=None):
 	param = {
       'grant_type': 'password',
-      'client_id': client_id,
-      'client_secret': client_secret,
+      'client_id': client_keys[0][0],
+      'client_secret': client_keys[0][1],
       'username': login,
       'password': password,
       'v': VK_API_VERSION,

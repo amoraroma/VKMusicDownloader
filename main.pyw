@@ -14,9 +14,7 @@ from ui import auth
 from ui import tech_info
 from ui import mainwindow
 
-
-from PyQt5.QtWidgets import QWidget, QDesktopWidget, QApplication, \
-    QMessageBox, QFileDialog, QInputDialog, QStyleFactory
+from PyQt5.QtWidgets import QWidget, QDesktopWidget, QApplication, QMessageBox, QFileDialog, QInputDialog, QStyleFactory
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot, QThread, Qt, pyqtSignal
@@ -57,8 +55,7 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
 
             self.statusBar().showMessage('Loading...')
 
-            r = vkapi.autorization(login, password,
-                vkapi.client_keys[0][0], vkapi.client_keys[0][1], path_oauth)
+            r = vkapi.autorization(login, password, path_oauth)
 
             # QMessageBox.about(self, "Message", str(r))
             
@@ -67,12 +64,9 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
                 code, ok = QInputDialog.getText(self, "Код потверждения", "Введите код из СМС")
 
                 if ok:
-                    r = vkapi.autorization(login, password,
-                        vkapi.client_keys[0][0], vkapi.client_keys[0][1], path_oauth, str(code))
+                    r = vkapi.autorization(login, password, path_oauth, str(code))
                 else:
-                    r = vkapi.autorization(login, password,
-                       vkapi.client_keys[0][0], vkapi.client_keys[0][1], path_oauth, "")
-
+                    r = vkapi.autorization(login, password, path_oauth, "")
 
             resp = json.loads(json.dumps(r))
 
@@ -97,6 +91,9 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
             else:
                 self.statusBar().showMessage('Login failed :(')
                 QMessageBox.critical(self, "F*CK", str(resp))
+        
+        except vkapi.VKException as ex:
+            QMessageBox.critical(self, "F*CK VK", str(ex))
 
         except Exception as e:
             self.statusBar().showMessage('Login failed :(')
@@ -173,6 +170,8 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
         self.progressBar.setFormat("%p% (%v/%m)")
         self.action_4.setShortcut("Ctrl+T")
 
+        self.data = None
+
 
     def LoadsListMusic(self):
         try:
@@ -187,15 +186,16 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
             path_api = utils.get_host_api(self.action_5.isChecked())
             path_oauth = utils.get_host_oauth(self.action_5.isChecked())
 
-            data = vkapi.get_audio(refresh_token, path_api)
-            utils.save_json('response.json', data)
+            self.data = vkapi.get_audio(refresh_token, path_api)
+            if(config.SaveToFile):
+                utils.save_json('response.json', self.data)
 
-            count_track = data['response']['count']
+            count_track = self.data['response']['count']
             i = 0
 
             QtWidgets.QTreeWidget.clear(self.treeWidget)
 
-            for count in data['response']['items']:
+            for count in self.data['response']['items']:
 
                 test = QtWidgets.QTreeWidgetItem(self.treeWidget)
 
@@ -218,6 +218,9 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
 
             self.label.setText("Всего аудиозаписей: " + str(count_track) + " Выбрано: " + str(0) + " Загружено: " + str(0))
 
+        except vkapi.VKException as ex:
+            QMessageBox.critical(self, "F*CK VK", str(ex))
+
         except Exception as e:
             QMessageBox.critical(self, "F*CK", str(e))
 
@@ -236,18 +239,23 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
             for i in getSelected:
                 downloads_list.append(int(i.text(0)))
 
-            if (utils.file_exists('response.json')):
-                with open('response.json', encoding='utf-8') as data_json:
-                    data = json.loads(data_json.read())
-            else:
-                raise Exception("File \"response.json\" not found")
+            if (config.SaveToFile):
+                if (utils.file_exists('response.json')):
+                    with open('response.json', encoding='utf-8') as data_json:
+                        self.data = json.loads(data_json.read())
+                else:
+                    raise Exception("File \"response.json\" not found")
             
-            count_track = data['response']['count']
+            count_track = self.data['response']['count']
 
             if (downloads_list.__len__() == 0):
                 QMessageBox.information(self, "Информация", "Ничего не выбрано.")
 
-            self.th = Downloads_file(downloads_list, PATH)
+            if(config.SaveToFile):
+                self.th = Downloads_file(PATH, downloads_list)
+            else:
+                self.th = Downloads_file(PATH, downloads_list, self.data)
+
             self.th.progress_range.connect(self.progress)
             self.th.progress.connect(self.progressBar.setValue)
             self.th.loading_audio.connect(self.loading_audio)
@@ -296,7 +304,6 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
             message = "Доступ к аудиозаписи: " + song_name + " скоро будет открыт"
         
         QMessageBox.warning(self, "Внимание", message)
-        # self.statusBar().showMessage(message)
 
     @pyqtSlot(int)
     def progress(self, range):
@@ -367,9 +374,10 @@ class Downloads_file(QThread):
     unavailable_audio = pyqtSignal(str)
     content_restricted = pyqtSignal(int, str)
 
-    def __init__(self, downloads_list, PATH):
+    def __init__(self, PATH, downloads_list=None, data=None):
         super().__init__()
         self.downloads_list = downloads_list
+        self.data = data
         self.PATH = PATH
 
 
@@ -380,36 +388,37 @@ class Downloads_file(QThread):
 
     def run(self):
         try:
-            if (utils.file_exists('response.json')):
-                with open('response.json', encoding='utf-8') as data_json:
-                    data = json.loads(data_json.read())
-            else:
-                raise Exception("File \"response.json\" not found")
+            if(config.SaveToFile):
+                if (utils.file_exists('response.json')):
+                    with open('response.json', encoding='utf-8') as data_json:
+                        self.data = json.loads(data_json.read())
+                else:
+                    raise Exception("File \"response.json\" not found")
 
             self.completed = 0
 
-            count_track = data['response']['count']
+            count_track = self.data['response']['count']
             selected = self.downloads_list.__len__()
 
             for item in self.downloads_list:
                 
-                artist = data['response']['items'][item-1]['artist']
-                title = data['response']['items'][item-1]['title']
+                artist = self.data['response']['items'][item-1]['artist']
+                title = self.data['response']['items'][item-1]['title']
 
                 msg = "Всего аудиозаписей: " + str(count_track) + " Выбрано: " + str(selected) + " Загружено: " + str(self.completed)
 
                 song_name = artist + " - " + title
 
                 filename = self.PATH + "/" + utils.remove_symbols(song_name) + ".mp3"
-                url = data['response']['items'][item-1]['url']
+                url = self.data['response']['items'][item-1]['url']
 
                 #total = int(utils.get_size_content(url))
                 #self.progress_range.emit(total)
 
-                if (data['response']['items'][item-1]['url'] == ""):
+                if (self.data['response']['items'][item-1]['url'] == ""):
                     
-                    if (data['response']['items'][item-1]['content_restricted']):
-                        self.content_restricted.emit(int(data['response']['items'][item-1]['content_restricted']), song_name)
+                    if (self.data['response']['items'][item-1]['content_restricted']):
+                        self.content_restricted.emit(int(self.data['response']['items'][item-1]['content_restricted']), song_name)
 
                     else:
                         self.unavailable_audio.emit(song_name)

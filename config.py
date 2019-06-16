@@ -15,3 +15,5 @@ SourceСode = "https://github.com/keyzt/VKMusicDownloader"
 
 Qiwi = 'https://qiwi.me/keyzt'
 YandexMoney = 'https://money.yandex.ru/to/410017272872402'
+
+SaveToFile = True
