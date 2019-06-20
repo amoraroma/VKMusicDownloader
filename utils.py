@@ -25,7 +25,7 @@ def file_exists(path):
         return os.path.exists(path)
     except OSError:
         return False
-        
+
 
 def get_path(self, flags, Object):
     if flags:
