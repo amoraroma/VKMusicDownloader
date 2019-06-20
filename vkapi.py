@@ -45,50 +45,50 @@ client_keys = [
 
 
 class VKException(Exception):
-	pass
+    pass
 
 
 def call_oauth(method, param={}, **kwargs):
-	"""Выполнение метода VK API"""
-	try:
-		response = requests.get(method,
-			params=param, headers=HEADER, timeout=TIME_OUT).json()
-	except Exception as e:
-		raise e
+    """Выполнение метода VK API"""
+    try:
+        response = requests.get(method,
+            params=param, headers=HEADER, timeout=TIME_OUT).json()
+    except Exception as e:
+        raise e
 
-	if 'error' in response:
-		if 'need_captcha' == response['error']:
-			raise VKException("Error : F*CKING CAPTHA!")
-		
-		elif 'need_validation' == response['error']:
-			if 'ban_info' in response:
-				# print(response)
-				raise VKException("Error: {error_description}".format(**response))
-			
-			return "Error: 2fa isn't supported"
-		
-		else:
-			raise VKException("Error : {error_description}".format(**response))
+    if 'error' in response:
+        if 'need_captcha' == response['error']:
+            raise VKException("Error : F*CKING CAPTHA!")
+        
+        elif 'need_validation' == response['error']:
+            if 'ban_info' in response:
+                # print(response)
+                raise VKException("Error: {error_description}".format(**response))
+            
+            return "Error: 2fa isn't supported"
+        
+        else:
+            raise VKException("Error : {error_description}".format(**response))
 
-	return response
+    return response
 
 
 def call(method, param={}, **kwargs):
-	"""Выполнение метода VK API"""
-	try:
-		response = requests.get(method,
-			params=param, headers=HEADER, timeout=TIME_OUT).json()
-	except Exception as e:
-		raise e
+    """Выполнение метода VK API"""
+    try:
+        response = requests.get(method,
+            params=param, headers=HEADER, timeout=TIME_OUT).json()
+    except Exception as e:
+        raise e
 
-	if 'error' in response:
-		raise VKException("VKError #{error_code}: {error_msg}".format(**response['error']))
+    if 'error' in response:
+        raise VKException("VKError #{error_code}: {error_msg}".format(**response['error']))
 
-	return response
+    return response
 
 
 def autorization(login, password, path, code=None, captcha_sid=None, captcha_key=None):
-	param = {
+    param = {
       'grant_type': 'password',
       'client_id': client_keys[0][0],
       'client_secret': client_keys[0][1],
@@ -100,49 +100,48 @@ def autorization(login, password, path, code=None, captcha_sid=None, captcha_key
       'captcha_sid' : captcha_sid,
       'captcha_key' : captcha_key
     }
-	
-	return call_oauth(path + "token", param)
+    return call_oauth(path + "token", param)
 
 
 def refreshToken(access_token, path):
-	param = {
-		'access_token': access_token,
-      	'receipt' : receipt,
-      	'v' : VK_API_VERSION
-	}
+    param = {
+        'access_token': access_token,
+        'receipt' : receipt,
+        'v' : VK_API_VERSION
+    }
 
-	return call(path + "method/auth.refreshToken", param)
+    return call(path + "method/auth.refreshToken", param)
 
 
 def user_get(access_token, path):
-	param = {
-		'access_token':access_token,
-		'v':VK_API_VERSION
-	}
+    param = {
+        'access_token':access_token,
+        'v':VK_API_VERSION
+    }
 
-	return call(path + "method/users.get", param)
+    return call(path + "method/users.get", param)
 
 
 def get_audio(refresh_token, path):
-	param = {
-		'access_token':refresh_token,
-		'v': VK_API_VERSION
-	}
+    param = {
+        'access_token':refresh_token,
+        'v': VK_API_VERSION
+    }
 
-	return call(path + "method/audio.get", param)
+    return call(path + "method/audio.get", param)
 
 
 def get_catalog(refresh_token, path):
-	param = {
+    param = {
       'access_token':refresh_token,
       'v': VK_API_VERSION
     }
 
-	return call(path + "method/audio.getCatalog", param)
+    return call(path + "method/audio.getCatalog", param)
 
 
 def get_playlist(refresh_token, path):
-	param = {
+    param = {
       'access_token':refresh_token,
       'owner_id':'',
       'id':'',
@@ -150,15 +149,15 @@ def get_playlist(refresh_token, path):
       'v': VK_API_VERSION
     }
 
-	return call(path + "method/execute.getPlaylist", param)
+    return call(path + "method/execute.getPlaylist", param)
 
 
 def get_music_page(refresh_token, path):
-	param = {
+    param = {
       'func_v':3,
       'need_playlists':1,
       'access_token':refresh_token,
       'v': VK_API_VERSION
     }
 
-	return call(path + "method/execute.getMusicPage", param)
+    return call(path + "method/execute.getMusicPage", param)

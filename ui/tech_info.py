@@ -56,4 +56,3 @@ class Ui_Form(object):
         self.label_5.setText(_translate("Form", "Хост:"))
         self.label_6.setText(_translate("Form", "Хост:"))
         self.pushButton_3.setText(_translate("Form", "OK"))
-

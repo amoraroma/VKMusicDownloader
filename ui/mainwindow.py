@@ -213,4 +213,3 @@ class Ui_MainWindow(object):
         self.action_5.setText(_translate("MainWindow", "Включить прокси"))
         # self.action_6.setText(_translate("MainWindow", "Использовать системные настройки прокси"))
         self.action_7.setText(_translate("MainWindow", "Выбрать папку для скачивания"))
-

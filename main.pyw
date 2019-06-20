@@ -17,7 +17,7 @@ from ui import mainwindow
 from PyQt5.QtWidgets import QWidget, QDesktopWidget, QApplication, QMessageBox, QFileDialog, QInputDialog, QStyleFactory
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSlot, QThread, Qt, pyqtSignal
+from PyQt5.QtCore import pyqtSlot, QThread, QObject, Qt, pyqtSignal
 
 
 locale.setlocale(locale.LC_ALL, "")
@@ -152,7 +152,7 @@ class TechInfo(QWidget, tech_info.Ui_Form):
 
 
 # Главное окно приложения         
-class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow):
+class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
 
     def __init__(self):
         super().__init__()
