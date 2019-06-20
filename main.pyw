@@ -154,6 +154,8 @@ class TechInfo(QWidget, tech_info.Ui_Form):
 # Главное окно приложения         
 class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
 
+    stoping = pyqtSignal(name='stop')
+    
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -440,6 +442,12 @@ class Downloads_file(QThread):
     def update_progress(self, current, total, width=80):
         self.progress_range.emit(total)
         self.progress.emit(current)
+
+    @pyqtSlot(name='stop')
+    def stop_download(self):
+        self.message.emit("Загузка остановлена")
+        self.exec_()
+
 
 
 class NetworkInfo(QThread):
