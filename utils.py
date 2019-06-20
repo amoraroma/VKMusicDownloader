@@ -3,7 +3,6 @@
 
 import os
 import re
-import sys
 import datetime
 import json
 
@@ -24,19 +23,17 @@ def remove_symbols(filename):
 def file_exists(path):
     try:
         return os.path.exists(path)
-    except OSError as e:
+    except OSError:
         return False
         
 
 def get_path(self, flags, Object):
     if flags:
-        path = Object.getExistingDirectory(
-            self, "Выберите папку для скачивания", "", Object.ShowDirsOnly)
-        
+        path = Object.getExistingDirectory(self, "Выберите папку для скачивания", "", Object.ShowDirsOnly)
         if path == "":
             return os.getcwd()
         else:
-            return path  
+            return path
     else:
         return os.getcwd()
 
@@ -58,7 +55,7 @@ def get_host_oauth(flags):
 def check_connection(url):
     try:
         requests.get(url, timeout=5)
-    except Exception as e:
+    except Exception:
         return False
 
     return True
@@ -67,7 +64,7 @@ def check_connection(url):
 def get_internal_ip():
     try:
         return socket.gethostbyname(socket.getfqdn())
-    except Exception as e:
+    except Exception:
         return None
 
 
@@ -76,7 +73,7 @@ def get_external_ip():
         return bytes(requests.get("http://ident.me/", timeout=5).content
             ).decode("utf-8")
 
-    except Exception as e:
+    except Exception:
         return None
 
 
