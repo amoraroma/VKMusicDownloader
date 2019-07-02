@@ -153,8 +153,6 @@ class TechInfo(QWidget, tech_info.Ui_Form):
 
 # Главное окно приложения         
 class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
-
-    stoping = pyqtSignal(name='stop')
     
     def __init__(self):
         super().__init__()
@@ -229,7 +227,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
 
     def Downloads(self):
         try:
-            self.pushButton.setEnabled(False) 
+            self.pushButton.setEnabled(False)
 
             PATH = utils.get_path(self, self.action_7.isChecked(), QFileDialog)
             self.label_2.setText("Путь для скачивания: " + PATH)
@@ -268,7 +266,6 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
             self.th.abort_download.connect(self.aborted_download)
             self.th.start()
 
-            #self.label_3.setText("Загружается:3")
         except Exception as e:
             QMessageBox.critical(self, "F*CK", str(e))
             self.pushButton.setEnabled(True)
@@ -443,12 +440,6 @@ class Downloads_file(QThread):
         self.progress_range.emit(total)
         self.progress.emit(current)
 
-    @pyqtSlot(name='stop')
-    def stop_download(self):
-        self.message.emit("Загузка остановлена")
-        self.exec_()
-
-
 
 class NetworkInfo(QThread):
 
@@ -473,10 +464,11 @@ class NetworkInfo(QThread):
             loc = data['country'] + ", " + data['region'] + ", " + data['city']
 
             self.external_ip.emit(data['ip'])
-            self.hostname.emit(data['hostname'])
+            if 'hostname' in data: self.hostname.emit(data['hostname'])
             self.location.emit(loc)
 
-        except:
+        except Exception as e:
+            # print(utils.get_network_info())
             self.internal_ip.emit(utils.get_internal_ip())
             self.external_ip.emit(None)
             self.hostname.emit(None)
