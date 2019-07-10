@@ -275,7 +275,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
             else:
                 self.th.terminate()
                 QMessageBox.information(self, "Информация", "Загрузка остановлена.")
-                self.pushButton.setText("Скачать")
+                self.set_ui_default()
                 self.th = None
                 self.data = None
 
@@ -284,20 +284,24 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
             self.pushButton.setText("Скачать")
 
 
-    def set_button_default(self):
+    def set_ui_default(self):
         self.pushButton.setText("Скачать")
         self.pushButton.setChecked(False)
+        self.progressBar.setValue(0)
+        self.progressBar.setRange(0, 100)
+        self.label_3.setText("Загружается: ")
+        self.label.setText("Всего аудиозаписей: " + str(self.data['response']['count']) + " Выбрано: " + str(0) + " Загружено: " + str(0))
 
 
     @pyqtSlot()
     def finished_loader(self):
         QMessageBox.information(self, "Информация", "Аудиозаписи загружены")
-        self.set_button_default()
+        self.set_ui_default()
 
     @pyqtSlot(str)
     def aborted_download(self, err_msg):
         QMessageBox.critical(self, "F*CK", "Загрузка прервана. Причина: " + err_msg)
-        self.set_button_default()
+        self.set_ui_default()
 
     @pyqtSlot(str)
     def loading_audio(self, song_name):
