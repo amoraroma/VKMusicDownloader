@@ -173,6 +173,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
 
         self.th = None
         self.data = None
+        self.PATH = ""
 
 
     def LoadsListMusic(self):
@@ -231,8 +232,8 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
         try:
             # self.pushButton.setEnabled(False)
 
-            PATH = utils.get_path(self, self.action_7.isChecked(), QFileDialog)
-            self.label_2.setText("Путь для скачивания: " + PATH)
+            self.PATH = utils.get_path(self, self.action_7.isChecked(), QFileDialog)
+            self.label_2.setText("Путь для скачивания: " + self.PATH)
 
             self.completed = 0
             downloads_list = []
@@ -258,9 +259,9 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
                 self.pushButton.setText("Остановить")
                 
                 if(config.SaveToFile):
-                    self.th = Downloads_file(PATH, downloads_list)
+                    self.th = Downloads_file(self.PATH, downloads_list)
                 else:
-                    self.th = Downloads_file(PATH, downloads_list, self.data)
+                    self.th = Downloads_file(self.PATH, downloads_list, self.data)
 
                 self.th.progress_range.connect(self.progress)
                 self.th.progress.connect(self.progressBar.setValue)
@@ -291,6 +292,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
         self.progressBar.setRange(0, 100)
         self.label_3.setText("Загружается: ")
         self.label.setText("Всего аудиозаписей: " + str(self.data['response']['count']) + " Выбрано: " + str(0) + " Загружено: " + str(0))
+        utils.remove_files(self.PATH + '/*.tmp')
 
 
     @pyqtSlot()

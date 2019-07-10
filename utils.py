@@ -3,6 +3,7 @@
 
 import os
 import re
+import glob
 import datetime
 import json
 
@@ -37,6 +38,19 @@ def get_path(self, flags, Object):
             return path
     else:
         return os.getcwd()
+
+
+def remove_files(paths):
+    files = glob.glob(paths)
+    
+    if not files:
+        return True
+
+    for file in files:
+        try:
+            os.remove(file)
+        except:
+            continue
 
 
 def get_host_api(flags):
