@@ -162,6 +162,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
         
         self.pushButton_2.clicked.connect(self.LoadsListMusic)
         self.pushButton.clicked.connect(self.Downloads)
+        self.pushButton.setCheckable(True)
         self.action.triggered.connect(self.AboutMessage)
         self.action_2.setShortcut("Ctrl+Q")
         self.action_2.triggered.connect(self.Logout)
@@ -170,6 +171,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
         self.progressBar.setFormat("%p% (%v/%m)")
         self.action_4.setShortcut("Ctrl+T")
 
+        self.th = None
         self.data = None
 
 
@@ -225,9 +227,9 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
             QMessageBox.critical(self, "F*CK", str(e))
 
 
-    def Downloads(self):
+    def Downloads(self, started):
         try:
-            self.pushButton.setEnabled(False)
+            # self.pushButton.setEnabled(False)
 
             PATH = utils.get_path(self, self.action_7.isChecked(), QFileDialog)
             self.label_2.setText("Путь для скачивания: " + PATH)
@@ -251,35 +253,51 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
             if (downloads_list.__len__() == 0):
                 QMessageBox.information(self, "Информация", "Ничего не выбрано.")
 
-            if(config.SaveToFile):
-                self.th = Downloads_file(PATH, downloads_list)
-            else:
-                self.th = Downloads_file(PATH, downloads_list, self.data)
+            if started:
 
-            self.th.progress_range.connect(self.progress)
-            self.th.progress.connect(self.progressBar.setValue)
-            self.th.loading_audio.connect(self.loading_audio)
-            self.th.message.connect(self.label.setText)
-            self.th.unavailable_audio.connect(self.unavailable_audio)
-            self.th.content_restricted.connect(self.content_restricted)
-            self.th.finished.connect(self.finished_loader)
-            self.th.abort_download.connect(self.aborted_download)
-            self.th.start()
+                self.pushButton.setText("Остановить")
+                
+                if(config.SaveToFile):
+                    self.th = Downloads_file(PATH, downloads_list)
+                else:
+                    self.th = Downloads_file(PATH, downloads_list, self.data)
+
+                self.th.progress_range.connect(self.progress)
+                self.th.progress.connect(self.progressBar.setValue)
+                self.th.loading_audio.connect(self.loading_audio)
+                self.th.message.connect(self.label.setText)
+                self.th.unavailable_audio.connect(self.unavailable_audio)
+                self.th.content_restricted.connect(self.content_restricted)
+                self.th.finished.connect(self.finished_loader)
+                self.th.abort_download.connect(self.aborted_download)
+                self.th.start()
+
+            else:
+                self.th.terminate()
+                QMessageBox.information(self, "Информация", "Загрузка остановлена.")
+                self.pushButton.setText("Скачать")
+                self.th = None
+                self.data = None
 
         except Exception as e:
             QMessageBox.critical(self, "F*CK", str(e))
-            self.pushButton.setEnabled(True)
+            self.pushButton.setText("Скачать")
+
+
+    def set_button_default(self):
+        self.pushButton.setText("Скачать")
+        self.pushButton.setChecked(False)
 
 
     @pyqtSlot()
     def finished_loader(self):
         QMessageBox.information(self, "Информация", "Аудиозаписи загружены")
-        self.pushButton.setEnabled(True)
+        self.set_button_default()
 
     @pyqtSlot(str)
     def aborted_download(self, err_msg):
         QMessageBox.critical(self, "F*CK", "Загрузка прервана. Причина: " + err_msg)
-        self.pushButton.setEnabled(True)
+        self.set_button_default()
 
     @pyqtSlot(str)
     def loading_audio(self, song_name):
