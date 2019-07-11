@@ -40,8 +40,8 @@ def get_path(self, flags, Object):
         return os.getcwd()
 
 
-def remove_files(paths):
-    files = glob.glob(paths)
+def remove_files(paths, pattern):
+    files = glob.glob(paths + "/" + pattern)
     
     if not files:
         return True

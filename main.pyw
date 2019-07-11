@@ -292,7 +292,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
         self.progressBar.setRange(0, 100)
         self.label_3.setText("Загружается: ")
         self.label.setText("Всего аудиозаписей: " + str(self.data['response']['count']) + " Выбрано: " + str(0) + " Загружено: " + str(0))
-        utils.remove_files(self.PATH + '/*.tmp')
+        utils.remove_files(self.PATH , '*.tmp')
 
 
     @pyqtSlot()
