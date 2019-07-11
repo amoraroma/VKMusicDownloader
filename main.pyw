@@ -275,8 +275,8 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
 
             else:
                 self.th.terminate()
-                QMessageBox.information(self, "Информация", "Загрузка остановлена.")
                 self.set_ui_default()
+                QMessageBox.information(self, "Информация", "Загрузка остановлена.")
                 self.th = None
                 self.data = None
 
