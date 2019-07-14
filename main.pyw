@@ -173,6 +173,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
 
         self.th = None
         self.data = None
+        self.downloads_list = []
         self.PATH = ""
 
 
@@ -239,11 +240,10 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
             self.label_2.setText("Путь для скачивания: " + self.PATH)
 
             self.completed = 0
-            downloads_list = []
             getSelected = self.treeWidget.selectedItems()
 
             for i in getSelected:
-                downloads_list.append(int(i.text(0)))
+                self.downloads_list.append(int(i.text(0)))
 
             if (config.SaveToFile):
                 if (utils.file_exists('response.json')):
@@ -254,7 +254,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
             
             count_track = self.data['response']['count']
 
-            if (downloads_list.__len__() == 0):
+            if (self.downloads_list.__len__() == 0):
                 QMessageBox.information(self, "Информация", "Ничего не выбрано.")
 
             if started:
@@ -262,9 +262,9 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
                 self.pushButton.setText("Остановить")
                 
                 if(config.SaveToFile):
-                    self.th = Downloads_file(self.PATH, downloads_list)
+                    self.th = Downloads_file(self.PATH, self.downloads_list)
                 else:
-                    self.th = Downloads_file(self.PATH, downloads_list, self.data)
+                    self.th = Downloads_file(self.PATH, self.downloads_list, self.data)
 
                 self.th.progress_range.connect(self.progress)
                 self.th.progress.connect(self.progressBar.setValue)
@@ -281,7 +281,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
                 self.set_ui_default()
                 QMessageBox.information(self, "Информация", "Загрузка остановлена.")
                 self.th = None
-                self.data = None
+                self.downloads_list =[]
 
         except Exception as e:
             QMessageBox.critical(self, "F*CK", str(e))
