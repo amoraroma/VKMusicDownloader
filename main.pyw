@@ -208,14 +208,14 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
                 test.setText(3, utils.time_duration(count['duration']))
                 test.setText(4, utils.unix_time_stamp_convert(count['date']))
 
-                if 'is_hq' in count:
+                if ('is_hq' in count and 'is_explicit' in count):
+                    test.setText(5, "HQ (E)")
+                
+                elif 'is_hq' in count:
                     test.setText(5, "HQ")
                     
-                    if 'is_explicit' in count:
-                        test.setText(5, "E")
-                        
-                        if (count['is_hq'] and count['is_explicit']):
-                            test.setText(5, "HQ (E)")
+                elif 'is_explicit' in count:
+                    test.setText(5, "E")
 
                 if (count['url'] == ""):
                     test.setText(6, "Недоступно")
