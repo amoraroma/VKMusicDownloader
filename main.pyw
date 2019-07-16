@@ -59,7 +59,6 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
 
             # QMessageBox.about(self, "Message", str(r))
             
-            # Двухфакторка(немного говнокод)
             if (r =="Error: 2fa isn't supported"):
                 code, ok = QInputDialog.getText(self, "Код потверждения", "Введите код из СМС")
 
