@@ -82,7 +82,7 @@ def call(method, param={}, **kwargs):
         raise e
 
     if 'error' in response:
-        raise VKException("VKError #{error_code}: {error_msg}".format(**response['error']))
+        raise VKException("VKError ("+ method +") #{error_code}: {error_msg}".format(**response['error']))
 
     return response
 
