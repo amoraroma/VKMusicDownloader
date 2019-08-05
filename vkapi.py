@@ -18,7 +18,7 @@ VK_API_VERSION = "5.89"
 TIME_OUT = 10
 
 # Юзер-агент пользователя
-HEADER = {'user-agent': 'VKAndroidApp/5.11.1-2316'}
+HEADER = {'user-agent': 'VKAndroidApp/5.40-3904'}
 
 # Прокси от KateMobile
 PROXY_KATE = {'https' : 'https://proxy.katemobile.ru:3752'}
