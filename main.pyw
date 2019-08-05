@@ -171,6 +171,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
         self.action_4.setShortcut("Ctrl+T")
 
         self.th = None
+        self.is_loaded = False
         self.data = None
         self.downloads_list = []
         self.PATH = ""
@@ -223,6 +224,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
                 i += 1
 
             self.label.setText("Всего аудиозаписей: " + str(count_track) + " Выбрано: " + str(0) + " Загружено: " + str(0))
+            self.is_loaded = True
 
         except vkapi.VKException as ex:
             QMessageBox.critical(self, "F*CK VK", str(ex))
@@ -233,30 +235,32 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
 
     def Downloads(self, started):
         try:
-            # self.pushButton.setEnabled(False)
-
-            self.PATH = utils.get_path(self, self.action_7.isChecked(), QFileDialog)
-            self.label_2.setText("Путь для скачивания: " + self.PATH)
-
-            self.completed = 0
-            getSelected = self.treeWidget.selectedItems()
-
-            for i in getSelected:
-                self.downloads_list.append(int(i.text(0)))
-
-            if (config.SaveToFile):
-                if (utils.file_exists('response.json')):
-                    with open('response.json', encoding='utf-8') as data_json:
-                        self.data = json.loads(data_json.read())
-                else:
-                    raise Exception("File \"response.json\" not found")
-            
-            count_track = self.data['response']['count']
-
-            if (self.downloads_list.__len__() == 0):
-                QMessageBox.information(self, "Информация", "Ничего не выбрано.")
+            if self.is_loaded != True:
+                self.pushButton.setChecked(False)
+                raise Exception("Вы не загрузили аудиозаписи")
 
             if started:
+
+                self.PATH = utils.get_path(self, self.action_7.isChecked(), QFileDialog)
+                self.label_2.setText("Путь для скачивания: " + self.PATH)
+
+                self.completed = 0
+                getSelected = self.treeWidget.selectedItems()
+
+                for i in getSelected:
+                    self.downloads_list.append(int(i.text(0)))
+
+                if (config.SaveToFile):
+                    if (utils.file_exists('response.json')):
+                        with open('response.json', encoding='utf-8') as data_json:
+                            self.data = json.loads(data_json.read())
+                    else:
+                        raise Exception("File \"response.json\" not found")
+                
+                count_track = self.data['response']['count']
+
+                if (self.downloads_list.__len__() == 0):
+                    QMessageBox.information(self, "Информация", "Ничего не выбрано.")
 
                 self.pushButton.setText("Остановить")
                 
