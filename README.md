@@ -1,5 +1,5 @@
 # VKMusicDownloader
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fea1d869b9c44e059e543037e968e6dc)](https://app.codacy.com/app/keyzt/VKMusicDownloader?utm_source=github.com&utm_medium=referral&utm_content=keyzt/VKMusicDownloader&utm_campaign=Badge_Grade_Dashboard)
+
 [![GitHub license](https://img.shields.io/github/license/keyzt/VKMusicDownloader.svg)](https://github.com/keyzt/VKMusicDownloader/blob/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/keyzt/VKMusicDownloader.svg)](https://github.com/keyzt/VKMusicDownloader/issues)
 [![image](https://img.shields.io/github/contributors/keyzt/VKMusicDownloader.svg)](https://github.com/keyzt/VKMusicDownloader/graphs/contributors)
