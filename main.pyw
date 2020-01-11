@@ -189,8 +189,9 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
             
             path_api = utils.get_host_api(self.action_5.isChecked())
             path_oauth = utils.get_host_oauth(self.action_5.isChecked())
-
+            
             self.data = vkapi.get_audio(refresh_token, path_api)
+
             if(config.SaveToFile):
                 utils.save_json('response.json', self.data)
 
