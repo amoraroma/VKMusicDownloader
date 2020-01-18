@@ -50,8 +50,8 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
             login = self.lineEdit.text()
             password = self.lineEdit_2.text()
 
-            path_api = utils.get_host_api(self.action.isChecked())
-            path_oauth = utils.get_host_oauth(self.action.isChecked())
+            isProxyOauth = utils.get_proxy_host(self.action.isChecked(), False)
+            isProxyAPI = utils.get_proxy_host(self.action.isChecked())
 
             self.statusBar().showMessage('Loading...')
 
@@ -63,9 +63,9 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
                 code, ok = QInputDialog.getText(self, "Код потверждения", "Введите код из СМС")
 
                 if ok:
-                    r = vkapi.autorization(login, password, path_oauth, str(code))
+                    r = vkapi.autorization(login, password, isProxyOauth, str(code))
                 else:
-                    r = vkapi.autorization(login, password, path_oauth, "")
+                    r = vkapi.autorization(login, password, isProxyOauth, "")
 
             resp = json.loads(json.dumps(r))
 
@@ -76,7 +76,7 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
 
                 self.statusBar().showMessage('Getting refresh_token')
 
-                getRefreshToken = vkapi.refreshToken(access_token, path_api)
+                getRefreshToken = vkapi.refreshToken(access_token, isProxyAPI)
                 refresh_token = getRefreshToken["response"]["token"]
 
                 DATA = {'access_token': access_token, 'token': refresh_token}
@@ -187,10 +187,10 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
             access_token = data_token["access_token"]
             refresh_token = data_token["token"]
             
-            path_api = utils.get_host_api(self.action_5.isChecked())
-            path_oauth = utils.get_host_oauth(self.action_5.isChecked())
+            isProxyAPI = utils.get_proxy_host(self.action_5.isChecked())
+            
+            self.data = vkapi.get_audio(refresh_token, isProxyAPI)
 
-            self.data = vkapi.get_audio(refresh_token, path_api)
             if(config.SaveToFile):
                 utils.save_json('response.json', self.data)
 
@@ -367,8 +367,12 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
 
 
     def TechInformation(self):
-        path_api = utils.get_host_api(self.action_5.isChecked())
-        path_oauth = utils.get_host_oauth(self.action_5.isChecked())
+        if (self.action_5.isChecked()):
+            path_api = 'https://' + vkapi.HOST_API_PROXY
+            path_oauth = 'https://' + vkapi.HOST_OAUTH_PROXY
+        else:
+            path_api = 'https://' + vkapi.HOST_API
+            path_oauth = 'https://' + vkapi.HOST_OAUTH
         
         self.tech_info_window = TechInfo(path_api, path_oauth)
 

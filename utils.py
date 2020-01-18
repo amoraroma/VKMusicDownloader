@@ -53,18 +53,18 @@ def remove_files(paths, pattern):
             continue
 
 
-def get_host_api(flags):
+def get_proxy_host(flags, api=True):
     if flags:
-        return vkapi.HOST_API_PROXY
+        if api:
+            return vkapi.BASE_PROXY_API_URL
+        else:
+            return vkapi.BASE_PROXY_OAUTH_URL
     else:
-        return vkapi.HOST_API
+        if api:
+            return vkapi.BASE_API_URL
+        else:
+            return vkapi.BASE_OAUTH_URL  
 
-
-def get_host_oauth(flags):
-    if flags:
-        return vkapi.OAUTH_PROXY
-    else:
-        return vkapi.OAUTH
 
 
 def check_connection(url):
@@ -112,22 +112,3 @@ def save_json(filename, data):
 
 def downloads_files_in_wget(url, filename, progress):
     wget.download(url, filename, bar=progress)
-
-
-def encode(key, clear):
-    enc = []
-    for i in range(len(clear)):
-        key_c = key[i % len(key)]
-        enc_c = chr((ord(clear[i]) + ord(key_c)) % 256)
-        enc.append(enc_c)
-    return base64.urlsafe_b64encode("".join(enc).encode()).decode()
-
-
-def decode(key, enc):
-    dec = []
-    enc = base64.urlsafe_b64decode(enc).decode()
-    for i in range(len(enc)):
-        key_c = key[i % len(key)]
-        dec_c = chr((256 + ord(enc[i]) - ord(key_c)) % 256)
-        dec.append(dec_c)
-    return "".join(dec)
