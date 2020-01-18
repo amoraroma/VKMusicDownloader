@@ -53,18 +53,18 @@ def remove_files(paths, pattern):
             continue
 
 
-def get_host_api(flags):
+def get_proxy_host(flags, api=True):
     if flags:
-        return vkapi.HOST_API_PROXY
+        if api:
+            return vkapi.BASE_PROXY_API_URL
+        else:
+            return vkapi.BASE_PROXY_OAUTH_URL
     else:
-        return vkapi.HOST_API
+        if api:
+            return vkapi.BASE_API_URL
+        else:
+            return vkapi.BASE_OAUTH_URL  
 
-
-def get_host_oauth(flags):
-    if flags:
-        return vkapi.OAUTH_PROXY
-    else:
-        return vkapi.OAUTH
 
 
 def check_connection(url):

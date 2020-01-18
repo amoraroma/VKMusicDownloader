@@ -3,13 +3,22 @@
 
 import requests
 
-# Домен API
-HOST_API = 'https://api.vk.com/'
-# Домен OAuth
-OAUTH = 'https://oauth.vk.com/'
 
-HOST_API_PROXY ="https://vk-api-proxy.xtrafrancyz.net/"
-OAUTH_PROXY = "https://vk-oauth-proxy.xtrafrancyz.net/"
+# Домен API, OAuth
+HOST_API = 'api.vk.com'
+HOST_OAUTH = 'oauth.vk.com'
+
+# Прокси
+HOST_API_PROXY ="vk-api-proxy.xtrafrancyz.net"
+HOST_OAUTH_PROXY = "vk-oauth-proxy.xtrafrancyz.net"
+
+# Базовый URL
+BASE_API_URL = "https://{0}/method/".format(HOST_API)
+BASE_OAUTH_URL = "https://{0}/".format(HOST_OAUTH)
+
+# Базовый Proxy URL
+BASE_PROXY_API_URL = "https://{0}/method/".format(HOST_API_PROXY)
+BASE_PROXY_OAUTH_URL = "https://{0}/".format(HOST_OAUTH_PROXY)
 
 # Версия API
 VK_API_VERSION = "5.89"
@@ -45,12 +54,20 @@ client_keys = [
 
 
 class VKException(Exception):
-    pass
+  pass
 
 
-def call_oauth(method, param={}, **kwargs):
+def call_oauth(method, proxy, param=None, **kwargs):
+    
+    HOST = ''
+
+    if proxy:
+      HOST = BASE_OAUTH_URL
+    else:
+      HOST = BASE_PROXY_OAUTH_URL
+
     try:
-        response = requests.get(method,
+        response = requests.get(HOST + method,
             params=param, headers=HEADER, timeout=TIME_OUT).json()
     except Exception as e:
         raise e
@@ -72,9 +89,14 @@ def call_oauth(method, param={}, **kwargs):
     return response
 
 
-def call(method, param={}, **kwargs):
+def call(method, proxy, param=None, **kwargs):
+    HOST = ''
+    if proxy:
+      HOST = BASE_API_URL
+    else:
+      HOST = BASE_PROXY_API_URL
     try:
-        response = requests.get(method,
+        response = requests.get(HOST + method,
             params=param, headers=HEADER, timeout=TIME_OUT).json()
     except Exception as e:
         raise e
@@ -85,7 +107,7 @@ def call(method, param={}, **kwargs):
     return response
 
 
-def autorization(login, password, path, code=None, captcha_sid=None, captcha_key=None):
+def autorization(login, password, proxy=False, code=None, captcha_sid=None, captcha_key=None):
     param = {
       'grant_type': 'password',
       'client_id': client_keys[0][0],
@@ -98,47 +120,47 @@ def autorization(login, password, path, code=None, captcha_sid=None, captcha_key
       'captcha_sid' : captcha_sid,
       'captcha_key' : captcha_key
     }
-    return call_oauth(path + "token", param)
+    return call_oauth("token", proxy, param)
 
 
-def refreshToken(access_token, path):
+def refreshToken(access_token, proxy=False):
     param = {
         'access_token': access_token,
         'receipt' : receipt,
         'v' : VK_API_VERSION
     }
 
-    return call(path + "method/auth.refreshToken", param)
+    return call("auth.refreshToken", proxy, param)
 
 
-def user_get(access_token, path):
+def user_get(access_token, proxy=False):
     param = {
         'access_token':access_token,
         'v':VK_API_VERSION
     }
 
-    return call(path + "method/users.get", param)
+    return call("users.get", proxy, param)
 
 
-def get_audio(refresh_token, path):
+def get_audio(refresh_token, proxy=False):
     param = {
         'access_token':refresh_token,
         'v': VK_API_VERSION
     }
 
-    return call(path + "method/audio.get", param)
+    return call("audio.get", proxy, param)
 
 
-def get_catalog(refresh_token, path):
+def get_catalog(refresh_token, proxy=False):
     param = {
       'access_token':refresh_token,
       'v': VK_API_VERSION
     }
 
-    return call(path + "method/audio.getCatalog", param)
+    return call("audio.getCatalog", proxy, param)
 
 
-def get_playlist(refresh_token, path):
+def get_playlist(refresh_token, proxy=False):
     param = {
       'access_token':refresh_token,
       'owner_id':'',
@@ -147,10 +169,10 @@ def get_playlist(refresh_token, path):
       'v': VK_API_VERSION
     }
 
-    return call(path + "method/execute.getPlaylist", param)
+    return call("execute.getPlaylist", proxy, param)
 
 
-def get_music_page(refresh_token, path):
+def get_music_page(refresh_token, proxy=False):
     param = {
       'func_v':3,
       'need_playlists':1,
@@ -158,4 +180,5 @@ def get_music_page(refresh_token, path):
       'v': VK_API_VERSION
     }
 
-    return call(path + "method/execute.getMusicPage", param)
+    return call("execute.getMusicPage", proxy, param)
+    
