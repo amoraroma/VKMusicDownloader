@@ -63,9 +63,7 @@ def get_proxy_host(flags, api=True):
         if api:
             return vkapi.BASE_API_URL
         else:
-            return vkapi.BASE_OAUTH_URL  
-
-
+            return vkapi.BASE_OAUTH_URL
 
 def check_connection(url):
     try:

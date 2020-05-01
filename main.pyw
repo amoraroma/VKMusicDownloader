@@ -55,7 +55,7 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
 
             self.statusBar().showMessage('Loading...')
 
-            r = vkapi.autorization(login, password)
+            r = vkapi.autorization(login, password, isProxyOauth)
 
             # QMessageBox.about(self, "Message", str(r))
             
