@@ -47,6 +47,7 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
 
     def autorizations(self):
         try:
+            
             login = self.lineEdit.text()
             password = self.lineEdit_2.text()
 
@@ -59,6 +60,9 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
 
             # QMessageBox.about(self, "Message", str(r))
             
+            if (type(r) is dict):
+                raise Exception("F*CKING CAPTHA!")
+
             if (r =="Error: 2fa isn't supported"):
                 code, ok = QInputDialog.getText(self, "Код потверждения", "Введите код из СМС")
 

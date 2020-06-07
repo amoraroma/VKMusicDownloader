@@ -74,7 +74,7 @@ def call_oauth(method, proxy, param=None, **kwargs):
 
     if 'error' in response:
         if 'need_captcha' == response['error']:
-            raise VKException("Error : F*CKING CAPTHA!")
+            return dict(type="need_captha", raw=response)
         
         elif 'need_validation' == response['error']:
             if 'ban_info' in response:
