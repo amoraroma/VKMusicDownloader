@@ -3,11 +3,9 @@
 
 import os
 import re
-import glob
 import datetime
 import json
 
-import base64
 import requests
 import socket
 import wget
@@ -38,19 +36,6 @@ def get_path(self, flags, Object):
             return path
     else:
         return os.getcwd()
-
-
-def remove_files(paths, pattern):
-    files = glob.glob(paths + "/" + pattern)
-    
-    if not files:
-        return True
-
-    for file in files:
-        try:
-            os.remove(file)
-        except:
-            continue
 
 
 def get_proxy_host(flags, api=True):

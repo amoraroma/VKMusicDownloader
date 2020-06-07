@@ -92,9 +92,9 @@ def call_oauth(method, proxy, param=None, **kwargs):
 def call(method, proxy, param=None, **kwargs):
     HOST = ''
     if proxy:
-      HOST = BASE_API_URL
-    else:
       HOST = BASE_PROXY_API_URL
+    else:
+      HOST = BASE_API_URL
     try:
         response = requests.get(HOST + method,
             params=param, headers=HEADER, timeout=TIME_OUT).json()

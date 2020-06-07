@@ -187,7 +187,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
             access_token = data_token["access_token"]
             refresh_token = data_token["token"]
             
-            isProxyAPI = utils.get_proxy_host(self.action_5.isChecked())
+            isProxyAPI = self.action_5.isChecked()
             
             self.data = vkapi.get_audio(refresh_token, isProxyAPI)
 
@@ -298,7 +298,6 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow.Ui_MainWindow, QObject):
         self.progressBar.setRange(0, 100)
         self.label_3.setText("Загружается: ")
         self.label.setText("Всего аудиозаписей: " + str(self.data['response']['count']) + " Выбрано: " + str(0) + " Загружено: " + str(0))
-        utils.remove_files(self.PATH , '*.tmp')
 
 
     @pyqtSlot()
@@ -445,8 +444,6 @@ class Downloads_file(QThread):
                 filename = self.PATH + "/" + utils.remove_symbols(song_name) + ".mp3"
                 url = self.data['response']['items'][item-1]['url']
 
-                #total = int(utils.get_size_content(url))
-                #self.progress_range.emit(total)
 
                 if (self.data['response']['items'][item-1]['url'] == ""):
                     
