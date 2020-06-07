@@ -59,9 +59,6 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
             r = vkapi.autorization(login, password, isProxyOauth)
 
             # QMessageBox.about(self, "Message", str(r))
-            
-            if (type(r) is dict):
-                raise Exception("F*CKING CAPTHA!")
 
             if (r =="Error: 2fa isn't supported"):
                 code, ok = QInputDialog.getText(self, "Код потверждения", "Введите код из СМС")
