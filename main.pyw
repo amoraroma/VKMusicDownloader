@@ -52,7 +52,7 @@ class Auth(QtWidgets.QMainWindow, auth.Ui_MainWindow):
             password = self.lineEdit_2.text()
 
             isProxyOauth = utils.get_proxy_host(self.action.isChecked(), False)
-            isProxyAPI = utils.get_proxy_host(self.action.isChecked())
+            isProxyAPI = self.action.isChecked()
 
             self.statusBar().showMessage('Loading...')
 
